@@ -6,6 +6,12 @@ type Layout interface {
 	Compose([]image.Image) Node
 }
 
+// TopHeavyLayout creates a layout that works well for up to 4 images with a landscape aspect ratio.
+// In this layout, 2 images are shown with equal sizes one atop the other. With 3 images the bottom
+// part will get split in half and 2 images will be fit into that part side by side. With 4 and more
+// images, the first image will be on top and rest of the images will be on a single row below, all
+// with equal widths. Also, with 4 and more images, the top part's height will be 2 times that of the
+// bottom one.
 func TopHeavyLayout() Layout {
 	return topHeavy{}
 }
