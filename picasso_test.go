@@ -17,6 +17,7 @@ const (
 	GirlBeforeAMirror TestImage = "./test_images/picasso-girl_before_a_mirror.jpg"
 	OldGuitarist      TestImage = "./test_images/picasso-the_old_guitarist.jpg"
 	WomenOfAlgiers    TestImage = "./test_images/picasso-the_women_of_algiers.jpg"
+	Bullfight         TestImage = "./test_images/picasso-bullfight.jpg"
 )
 
 func (i TestImage) read() image.Image {
@@ -32,15 +33,19 @@ func (i TestImage) read() image.Image {
 var _ = Describe("Picasso", func() {
 	Describe("Node.Draw", func() {
 		It("draws", func() {
-			image := VerticalSplit{
-				Ratio: 0.5,
-				Left:  Picture{GirlBeforeAMirror.read()},
-				Right: VerticalSplit{
-					Ratio: 1,
-					Left:  Picture{OldGuitarist.read()},
-					Right: Picture{WomenOfAlgiers.read()},
+			image := HorizontalSplit{
+				Ratio: 2,
+				Top:   Picture{Bullfight.read()},
+				Bottom: VerticalSplit{
+					Ratio: 0.5,
+					Left:  Picture{GirlBeforeAMirror.read()},
+					Right: VerticalSplit{
+						Ratio: 1,
+						Left:  Picture{OldGuitarist.read()},
+						Right: Picture{WomenOfAlgiers.read()},
+					},
 				},
-			}.Draw(400, 200)
+			}.Draw(400, 600)
 
 			outfile, err := os.Create("./test_images/composed.jpeg")
 			Expect(err).NotTo(HaveOccurred())
