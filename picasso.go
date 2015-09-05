@@ -41,7 +41,7 @@ func (n VerticalSplit) Draw(width, height int) image.Image {
 	draw.Draw(dst, leftRect, leftImage, image.ZP, draw.Over)
 
 	rightImage := n.Right.Draw(rightWidth, height)
-	rightRect := image.Rect(leftWidth, 0, rightWidth, height)
+	rightRect := image.Rect(leftWidth, 0, width, height)
 	draw.Draw(dst, rightRect, rightImage, image.ZP, draw.Over)
 
 	return dst
