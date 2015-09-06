@@ -1,6 +1,9 @@
 package picasso
 
-import "image"
+import (
+	"image"
+	"math"
+)
 
 type Layout interface {
 	Compose([]image.Image) Node
@@ -58,5 +61,77 @@ func createJustifiedVerticalSplits(images []image.Image) Node {
 		Ratio: float32(1) / float32(len(tail)),
 		Left:  Picture{images[0]},
 		Right: createJustifiedVerticalSplits(tail),
+	}
+}
+
+// GoldenSpiralLayout will create a layout that creates splits following a golden spiral that
+// starts moving to the right and to the bottom (the most common version).
+func GoldenSpiralLayout() Layout {
+	return goldenSpiral{}
+}
+
+type goldenSpiral struct{}
+
+func (l goldenSpiral) Compose(images []image.Image) Node {
+	return l.splitRight(images)
+}
+
+func (l goldenSpiral) splitRight(images []image.Image) Node {
+	if len(images) == 0 {
+		return nil
+	} else if len(images) == 1 {
+		return Picture{images[0]}
+	}
+
+	tail := images[1:]
+	return VerticalSplit{
+		Ratio: math.Phi,
+		Left:  Picture{images[0]},
+		Right: l.splitBelow(tail),
+	}
+}
+
+func (l goldenSpiral) splitBelow(images []image.Image) Node {
+	if len(images) == 0 {
+		return nil
+	} else if len(images) == 1 {
+		return Picture{images[0]}
+	}
+
+	tail := images[1:]
+	return HorizontalSplit{
+		Ratio:  math.Phi,
+		Top:    Picture{images[0]},
+		Bottom: l.splitLeft(tail),
+	}
+}
+
+func (l goldenSpiral) splitLeft(images []image.Image) Node {
+	if len(images) == 0 {
+		return nil
+	} else if len(images) == 1 {
+		return Picture{images[0]}
+	}
+
+	tail := images[1:]
+	return VerticalSplit{
+		Ratio: float32(1) / math.Phi,
+		Left:  l.splitAbove(tail),
+		Right: Picture{images[0]},
+	}
+}
+
+func (l goldenSpiral) splitAbove(images []image.Image) Node {
+	if len(images) == 0 {
+		return nil
+	} else if len(images) == 1 {
+		return Picture{images[0]}
+	}
+
+	tail := images[1:]
+	return HorizontalSplit{
+		Ratio:  float32(1) / math.Phi,
+		Top:    l.splitRight(tail),
+		Bottom: Picture{images[0]},
 	}
 }

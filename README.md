@@ -39,13 +39,15 @@ images = []image.Image{
 	oldGuitarist,
 	womenOfAlgiers,
 	bullfight,
+	weepingWoman,
+	laReve,
 }
-layout := picasso.TopHeavyLayout()
-image := layout.Compose(images).Draw(400, 600)
+layout := picasso.GoldenSpiralLayout()
+image := layout.Compose(images).Draw(600, 600)
 ```
 
-Will compose a similar image:
+Will compose an image using the golden ratio:
 
-![manual](https://raw.githubusercontent.com/deiwin/picasso/master/test_images/top_heavy-4.png)
+![automatic](https://raw.githubusercontent.com/deiwin/picasso/master/test_images/golden_spiral-6.png)
 
 *See tests for more examples*
