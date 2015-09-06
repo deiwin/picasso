@@ -66,7 +66,7 @@ var _ = Describe("Picasso", func() {
 				er, eg, eb, ea := expectedColor.RGBA()
 				r, g, b, a := i.At(x, y).RGBA()
 				// There might be some differences while creating the image on different machines.
-				// To account for that, expect the images to be similat, but not exactly the same.
+				// To account for that, expect the images to be similar, but not exactly the same.
 				Expect(r).To(BeNumerically("~", er, 2))
 				Expect(g).To(BeNumerically("~", eg, 2))
 				Expect(b).To(BeNumerically("~", eb, 2))
