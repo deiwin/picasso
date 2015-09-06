@@ -57,20 +57,12 @@ func (i TestImage) write(data image.Image) {
 
 var _ = Describe("Picasso", func() {
 	ExpectToEqualTestImage := func(i image.Image, testImage TestImage) {
-		expected := testImage.read()
-		Expect(i.Bounds().Dx()).To(Equal(expected.Bounds().Dx()))
-		Expect(i.Bounds().Dy()).To(Equal(expected.Bounds().Dy()))
+		composed := testImage.read()
+		Expect(i.Bounds().Dx()).To(Equal(composed.Bounds().Dx()))
+		Expect(i.Bounds().Dy()).To(Equal(composed.Bounds().Dy()))
 		for x := 0; x < i.Bounds().Dx(); x++ {
 			for y := 0; y < i.Bounds().Dy(); y++ {
-				expectedColor := expected.At(x, y)
-				er, eg, eb, ea := expectedColor.RGBA()
-				r, g, b, a := i.At(x, y).RGBA()
-				// There might be some differences while creating the image on different machines.
-				// To account for that, expect the images to be similar, but not exactly the same.
-				Expect(r).To(BeNumerically("~", er, 2))
-				Expect(g).To(BeNumerically("~", eg, 2))
-				Expect(b).To(BeNumerically("~", eb, 2))
-				Expect(a).To(BeNumerically("~", ea, 2))
+				Expect(i.At(x, y)).To(Equal(composed.At(x, y)))
 			}
 		}
 	}
