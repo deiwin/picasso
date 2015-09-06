@@ -10,16 +10,16 @@
 The following code:
 
 ```go
-image := HorizontalSplit{
+image := picasso.HorizontalSplit{
 	Ratio: 2,
-	Top:   Picture{bullfight},
-	Bottom: VerticalSplit{
+	Top:   picasso.Picture{bullfight},
+	Bottom: picasso.VerticalSplit{
 		Ratio: 0.5,
-		Left:  Picture{girlBeforeAMirror},
-		Right: VerticalSplit{
+		Left:  picasso.Picture{girlBeforeAMirror},
+		Right: picasso.VerticalSplit{
 			Ratio: 1,
-			Left:  Picture{oldGuitarist},
-			Right: Picture{womenOfAlgiers},
+			Left:  picasso.Picture{oldGuitarist},
+			Right: picasso.Picture{womenOfAlgiers},
 		},
 	},
 }.Draw(400, 600)
