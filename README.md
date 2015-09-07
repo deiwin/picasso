@@ -31,7 +31,7 @@ Will compose the following image:
 
 ### Automatic layouts
 
-*Picasso* also supports different automatic layouts, so that the following code:
+*Picasso* also supports different automatic layouts and borders, so that the following code:
 
 ```go
 images = []image.Image{
@@ -43,11 +43,11 @@ images = []image.Image{
 	laReve,
 }
 layout := picasso.GoldenSpiralLayout()
-image := layout.Compose(images).Draw(600, 600)
+image := layout.Compose(images).DrawWithBorder(600, 600, color.RGBA{0xaf, 0xaf, 0xaf, 0xff}, 2)
 ```
 
 Will compose an image using the golden ratio:
 
-![automatic](https://raw.githubusercontent.com/deiwin/picasso/master/test_images/golden_spiral-6.png)
+![automatic](https://raw.githubusercontent.com/deiwin/picasso/master/test_images/golden_spiral_with_border.png)
 
 *See tests for more examples*

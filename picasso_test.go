@@ -2,6 +2,7 @@ package picasso_test
 
 import (
 	"image"
+	"image/color"
 	_ "image/jpeg"
 	"image/png"
 	"os"
@@ -22,6 +23,12 @@ const (
 	WeepingWoman      TestImage = "./test_images/picasso-the_weeping_woman.jpg"
 	LaReve            TestImage = "./test_images/picasso-la_reve.jpg"
 
+	PictureWithBorder             TestImage = "./test_images/picture_with_border.png"
+	VerticalSplitWithBorder       TestImage = "./test_images/vertical_split_with_border.png"
+	VerticalSplitWithThinBorder   TestImage = "./test_images/vertical_split_with_thin_border.png"
+	HorizontalSplitWithBorder     TestImage = "./test_images/horizontal_split_with_border.png"
+	HorizontalSplitWithThinBorder TestImage = "./test_images/horizontal_split_with_thin_border.png"
+
 	Composed TestImage = "./test_images/composed.png"
 
 	TopHeavy1 TestImage = "./test_images/top_heavy-1.png"
@@ -29,12 +36,13 @@ const (
 	TopHeavy3 TestImage = "./test_images/top_heavy-3.png"
 	TopHeavy4 TestImage = "./test_images/top_heavy-4.png"
 
-	GoldenSpiral1 TestImage = "./test_images/golden_spiral-1.png"
-	GoldenSpiral2 TestImage = "./test_images/golden_spiral-2.png"
-	GoldenSpiral3 TestImage = "./test_images/golden_spiral-3.png"
-	GoldenSpiral4 TestImage = "./test_images/golden_spiral-4.png"
-	GoldenSpiral5 TestImage = "./test_images/golden_spiral-5.png"
-	GoldenSpiral6 TestImage = "./test_images/golden_spiral-6.png"
+	GoldenSpiral1          TestImage = "./test_images/golden_spiral-1.png"
+	GoldenSpiral2          TestImage = "./test_images/golden_spiral-2.png"
+	GoldenSpiral3          TestImage = "./test_images/golden_spiral-3.png"
+	GoldenSpiral4          TestImage = "./test_images/golden_spiral-4.png"
+	GoldenSpiral5          TestImage = "./test_images/golden_spiral-5.png"
+	GoldenSpiral6          TestImage = "./test_images/golden_spiral-6.png"
+	GoldenSpiralWithBorder TestImage = "./test_images/golden_spiral_with_border.png"
 )
 
 func (i TestImage) read() image.Image {
@@ -67,23 +75,78 @@ var _ = Describe("Picasso", func() {
 		}
 	}
 
-	Describe("Node", func() {
-		It("draws the composed image", func() {
-			i := HorizontalSplit{
-				Ratio: 2,
-				Top:   Picture{Bullfight.read()},
-				Bottom: VerticalSplit{
-					Ratio: 0.5,
-					Left:  Picture{GirlBeforeAMirror.read()},
-					Right: VerticalSplit{
-						Ratio: 1,
-						Left:  Picture{OldGuitarist.read()},
-						Right: Picture{WomenOfAlgiers.read()},
-					},
-				},
-			}.Draw(400, 600)
+	Describe("Picture", func() {
+		Describe("DrawWithBorder", func() {
+			It("adds the borders", func() {
+				i := Picture{Bullfight.read()}.DrawWithBorder(400, 200, color.RGBA{0xff, 0x00, 0x00, 0xff}, 2)
+				ExpectToEqualTestImage(i, PictureWithBorder)
+			})
+		})
+	})
 
-			ExpectToEqualTestImage(i, Composed)
+	Describe("VerticalSplit", func() {
+		Describe("DrawWithBorder", func() {
+			It("adds the borders", func() {
+				i := VerticalSplit{
+					Ratio: 1,
+					Left:  Picture{OldGuitarist.read()},
+					Right: Picture{WomenOfAlgiers.read()},
+				}.DrawWithBorder(400, 400, color.RGBA{0xff, 0x00, 0x00, 0xff}, 2)
+				ExpectToEqualTestImage(i, VerticalSplitWithBorder)
+			})
+
+			It("adds thin borders", func() {
+				i := VerticalSplit{
+					Ratio: 1,
+					Left:  Picture{OldGuitarist.read()},
+					Right: Picture{WomenOfAlgiers.read()},
+				}.DrawWithBorder(400, 400, color.RGBA{0xff, 0x00, 0x00, 0xff}, 1)
+				ExpectToEqualTestImage(i, VerticalSplitWithThinBorder)
+			})
+		})
+	})
+
+	Describe("HorizontalSplit", func() {
+		Describe("DrawWithBorder", func() {
+			It("adds the borders", func() {
+				i := HorizontalSplit{
+					Ratio:  1,
+					Top:    Picture{Bullfight.read()},
+					Bottom: Picture{WomenOfAlgiers.read()},
+				}.DrawWithBorder(400, 400, color.RGBA{0xff, 0x00, 0x00, 0xff}, 2)
+				ExpectToEqualTestImage(i, HorizontalSplitWithBorder)
+			})
+
+			It("adds thin borders", func() {
+				i := HorizontalSplit{
+					Ratio:  1,
+					Top:    Picture{Bullfight.read()},
+					Bottom: Picture{WomenOfAlgiers.read()},
+				}.DrawWithBorder(400, 400, color.RGBA{0xff, 0x00, 0x00, 0xff}, 1)
+				ExpectToEqualTestImage(i, HorizontalSplitWithThinBorder)
+			})
+		})
+	})
+
+	Describe("Node", func() {
+		Describe("Draw", func() {
+			It("draws the composed image", func() {
+				i := HorizontalSplit{
+					Ratio: 2,
+					Top:   Picture{Bullfight.read()},
+					Bottom: VerticalSplit{
+						Ratio: 0.5,
+						Left:  Picture{GirlBeforeAMirror.read()},
+						Right: VerticalSplit{
+							Ratio: 1,
+							Left:  Picture{OldGuitarist.read()},
+							Right: Picture{WomenOfAlgiers.read()},
+						},
+					},
+				}.Draw(400, 600)
+
+				ExpectToEqualTestImage(i, Composed)
+			})
 		})
 	})
 
@@ -254,6 +317,13 @@ var _ = Describe("Picasso", func() {
 			It("draws the composed image", func() {
 				i := layout.Compose(images).Draw(600, 600)
 				ExpectToEqualTestImage(i, GoldenSpiral6)
+			})
+
+			Describe("with borders", func() {
+				It("draws the composed image with borders", func() {
+					i := layout.Compose(images).DrawWithBorder(600, 600, color.RGBA{0xaf, 0xaf, 0xaf, 0xff}, 2)
+					ExpectToEqualTestImage(i, GoldenSpiralWithBorder)
+				})
 			})
 		})
 	})
