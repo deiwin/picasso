@@ -70,7 +70,32 @@ func (l gridLayout) splitVertically(images []image.Image) Node {
 			Right: l.splitHorizontally(rightImages),
 		}
 	} else if proposedLeftHorizontalCount == 1 && proposedLeftVerticalCount == 1 && proposedRightHorizontalCount == 1 && proposedRightVerticalCount == 0 {
-
+		leftHasVertical, lastLeftVerticalIndex := indexOfLastVerticalImage(proposedLeftImages)
+		rightHasHorizontal, lastRightHorizontalIndex := indexOfLastHorizontalImage(proposedRightImages)
+		if leftHasVertical && rightHasHorizontal {
+			leftImages, rightImages := swapImage(proposedLeftImages, lastLeftVerticalIndex, proposedRightImages, lastRightHorizontalIndex)
+			return VerticalSplit{
+				Ratio: 1,
+				Left:  l.splitHorizontally(leftImages),
+				Right: l.splitHorizontally(rightImages),
+			}
+		}
+		leftHasHorizontal, lastLeftHorizontalIndex := indexOfLastHorizontalImage(proposedLeftImages)
+		if leftHasHorizontal {
+			leftImages, rightImages := move1ImageOver(proposedLeftImages, lastLeftHorizontalIndex, proposedRightImages)
+			return VerticalSplit{
+				Ratio: 1,
+				Left:  l.splitHorizontally(leftImages),
+				Right: l.splitHorizontally(rightImages),
+			}
+		}
+		nextToLastLeftVerticalIndex := indexOfNextToLastVerticalImage(proposedLeftImages)
+		leftImages, rightImages := move2ImagesOver(proposedLeftImages, nextToLastLeftVerticalIndex, lastLeftVerticalIndex, proposedRightImages)
+		return VerticalSplit{
+			Ratio: 1,
+			Left:  l.splitHorizontally(leftImages),
+			Right: l.splitHorizontally(rightImages),
+		}
 	}
 	return VerticalSplit{
 		Ratio: 1,
@@ -132,6 +157,21 @@ func indexOfLastVerticalImage(images []image.Image) (hasVerticalImage bool, inde
 		}
 	}
 	return false, -1
+}
+
+func indexOfNextToLastVerticalImage(images []image.Image) int {
+	foundLast := false
+	for i := len(images) - 1; i >= 0; i-- {
+		orientation := getImageOrientation(images[i])
+		if orientation == vertical {
+			if !foundLast {
+				foundLast = true
+				continue
+			}
+			return i
+		}
+	}
+	return -1
 }
 
 func indexOfLastHorizontalImage(images []image.Image) (hasHorizontalImage bool, index int) {
