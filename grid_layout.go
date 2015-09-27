@@ -64,6 +64,40 @@ func (l gridLayout) splitVertically(images []image.Image) Node {
 	}
 }
 
+func (l gridLayout) splitHorizontally(images []image.Image) Node {
+	if len(images) == 1 {
+		return Picture{images[0]}
+	}
+	// add + 1 for same reasons as above
+	midPoint := (len(images) + 1) / 2
+	proposedTopImages := images[:midPoint]
+	proposedBottomImages := images[midPoint:]
+	proposedTopHorizontalCount, proposedTopVerticalCount := l.countComposedOrientation(0, 0, proposedTopImages)
+	proposedBottomHorizontalCount, proposedBottomVerticalCount := l.countComposedOrientation(0, 0, proposedBottomImages)
+	// now we need to redistribute the images so that both sides would compose to horizontal orientation
+	// NB: this method expects this to be possible
+	if proposedTopHorizontalCount == 0 && proposedTopVerticalCount == 1 && proposedBottomHorizontalCount == 1 && proposedBottomVerticalCount == 1 {
+		topImages, bottomImages := move1HorizontalCountOver(proposedTopImages, proposedBottomImages)
+		return HorizontalSplit{
+			Ratio:  1,
+			Top:    l.splitVertically(topImages),
+			Bottom: l.splitVertically(bottomImages),
+		}
+	} else if proposedTopHorizontalCount == 1 && proposedTopVerticalCount == 1 && proposedBottomHorizontalCount == 0 && proposedBottomVerticalCount == 1 {
+		topImages, bottomImages := move1VerticalCountOver(proposedTopImages, proposedBottomImages)
+		return HorizontalSplit{
+			Ratio:  1,
+			Top:    l.splitVertically(topImages),
+			Bottom: l.splitVertically(bottomImages),
+		}
+	}
+	return HorizontalSplit{
+		Ratio:  1,
+		Top:    l.splitVertically(proposedTopImages),
+		Bottom: l.splitVertically(proposedBottomImages),
+	}
+}
+
 func move1VerticalCountOver(aImages, bImages []image.Image) ([]image.Image, []image.Image) {
 	aHasHorizontal, lastAHorizontalIndex := indexOfLastHorizontalImage(aImages)
 	bHasVertical, lastBVerticalIndex := indexOfLastVerticalImage(bImages)
@@ -90,13 +124,6 @@ func move1HorizontalCountOver(aImages, bImages []image.Image) ([]image.Image, []
 	}
 	nextToLastAVerticalIndex := indexOfNextToLastVerticalImage(aImages)
 	return move2ImagesOver(aImages, nextToLastAVerticalIndex, lastAVerticalIndex, bImages)
-}
-
-func (l gridLayout) splitHorizontally(images []image.Image) Node {
-	if len(images) == 1 {
-		return Picture{images[0]}
-	}
-	return nil
 }
 
 func move1ImageOver(aImages []image.Image, aIndex int, bImages []image.Image) ([]image.Image, []image.Image) {
