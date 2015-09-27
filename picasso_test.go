@@ -43,6 +43,15 @@ const (
 	GoldenSpiral5          TestImage = "./test_images/golden_spiral-5.png"
 	GoldenSpiral6          TestImage = "./test_images/golden_spiral-6.png"
 	GoldenSpiralWithBorder TestImage = "./test_images/golden_spiral_with_border.png"
+
+	Grid1           TestImage = "./test_images/grid-1.png"
+	Grid2           TestImage = "./test_images/grid-2.png"
+	Grid3           TestImage = "./test_images/grid-3.png"
+	Grid4Horizontal TestImage = "./test_images/grid-4-horizontal.png"
+	Grid4Vertical   TestImage = "./test_images/grid-4-vertical.png"
+	Grid5           TestImage = "./test_images/grid-5.png"
+	Grid6           TestImage = "./test_images/grid-6.png"
+	GridWithBorder  TestImage = "./test_images/grid_with_border.png"
 )
 
 func (i TestImage) read() image.Image {
@@ -222,7 +231,7 @@ var _ = Describe("Picasso", func() {
 		var layout = GoldenSpiralLayout()
 		var images []image.Image
 
-		Context("with 1 image", func() {
+		Context("with 0 images", func() {
 			It("returns nil", func() {
 				l := layout.Compose(images)
 				Expect(l).To(BeNil())
@@ -323,6 +332,133 @@ var _ = Describe("Picasso", func() {
 				It("draws the composed image with borders", func() {
 					i := layout.Compose(images).DrawWithBorder(600, 600, color.RGBA{0xaf, 0xaf, 0xaf, 0xff}, 2)
 					ExpectToEqualTestImage(i, GoldenSpiralWithBorder)
+				})
+			})
+		})
+	})
+
+	Describe("GridLayout", func() {
+		var images []image.Image
+
+		Context("with 0 images", func() {
+			It("returns nil", func() {
+				l := DrawGridLayout(images, 600)
+				Expect(l).To(BeNil())
+			})
+		})
+
+		Context("with 1 image", func() {
+			BeforeEach(func() {
+				images = []image.Image{GirlBeforeAMirror.read()}
+			})
+
+			It("draws the composed image", func() {
+				i := DrawGridLayout(images, 600)
+				ExpectToEqualTestImage(i, Grid1)
+			})
+		})
+
+		Context("with 2 images", func() {
+			BeforeEach(func() {
+				images = []image.Image{
+					GirlBeforeAMirror.read(),
+					OldGuitarist.read(),
+				}
+			})
+
+			It("draws the composed image", func() {
+				i := DrawGridLayout(images, 600)
+				ExpectToEqualTestImage(i, Grid2)
+			})
+		})
+
+		Context("with 3 images", func() {
+			BeforeEach(func() {
+				images = []image.Image{
+					GirlBeforeAMirror.read(),
+					OldGuitarist.read(),
+					WomenOfAlgiers.read(),
+				}
+			})
+
+			It("draws the composed image", func() {
+				i := DrawGridLayout(images, 600)
+				ExpectToEqualTestImage(i, Grid3)
+			})
+		})
+
+		Context("with 4 images the first 3 of which compose a vertical image", func() {
+			Context("with the 4th image being horizontal", func() {
+				BeforeEach(func() {
+					images = []image.Image{
+						GirlBeforeAMirror.read(),
+						OldGuitarist.read(),
+						WomenOfAlgiers.read(),
+						Bullfight.read(),
+					}
+				})
+
+				It("ignores the 4th image", func() {
+					i := DrawGridLayout(images, 600)
+					ExpectToEqualTestImage(i, Grid4Horizontal)
+				})
+			})
+
+			Context("with the 4th image being vertical", func() {
+				BeforeEach(func() {
+					images = []image.Image{
+						GirlBeforeAMirror.read(),
+						OldGuitarist.read(),
+						WomenOfAlgiers.read(),
+						LaReve.read(),
+					}
+				})
+
+				It("properly adds the 4th image", func() {
+					i := DrawGridLayout(images, 600)
+					ExpectToEqualTestImage(i, Grid4Vertical)
+				})
+			})
+		})
+
+		Context("with 5 images", func() {
+			BeforeEach(func() {
+				images = []image.Image{
+					GirlBeforeAMirror.read(),
+					OldGuitarist.read(),
+					WomenOfAlgiers.read(),
+					Bullfight.read(),
+					WeepingWoman.read(),
+				}
+			})
+
+			It("draws the composed image", func() {
+				i := DrawGridLayout(images, 600)
+				ExpectToEqualTestImage(i, Grid5)
+			})
+		})
+
+		Context("with 6 images", func() {
+			BeforeEach(func() {
+				images = []image.Image{
+					GirlBeforeAMirror.read(),
+					OldGuitarist.read(),
+					WomenOfAlgiers.read(),
+					Bullfight.read(),
+					WeepingWoman.read(),
+					LaReve.read(),
+				}
+			})
+
+			It("draws the composed image", func() {
+				i := DrawGridLayout(images, 600)
+				ExpectToEqualTestImage(i, Grid6)
+			})
+
+			Describe("with borders", func() {
+				It("draws the composed image with borders", func() {
+					i := DrawGridLayoutWithBorder(images, 600, color.RGBA{0xaf, 0xaf, 0xaf, 0xff}, 2)
+					ExpectToEqualTestImage(i, GridWithBorder)
 				})
 			})
 		})
