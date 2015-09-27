@@ -1,6 +1,10 @@
 package picasso
 
-import "image"
+import (
+	"image"
+	"image/color"
+	"math"
+)
 
 type orientation bool
 
@@ -18,14 +22,36 @@ func getImageOrientation(image image.Image) orientation {
 	}
 }
 
+func DrawGridLayout(images []image.Image, width int) image.Image {
+	l := gridLayout{}
+	orientation, node := l.compose(images)
+	height := l.getHeight(orientation, width)
+	return node.Draw(width, height)
+}
+
+func DrawGridLayoutWithBorder(images []image.Image, width int, borderColor color.Color, borderWidth int) image.Image {
+	l := gridLayout{}
+	orientation, node := l.compose(images)
+	height := l.getHeight(orientation, width)
+	return node.DrawWithBorder(width, height, borderColor, borderWidth)
+}
+
 type gridLayout struct{}
 
-func (l gridLayout) doThings(images []image.Image) Node {
+func (l gridLayout) getHeight(orientation orientation, width int) int {
+	if orientation == horizontal {
+		return int(float32(width) * math.Sqrt2)
+	} else {
+		return int(float32(width) / math.Sqrt2)
+	}
+}
+
+func (l gridLayout) compose(images []image.Image) (orientation, Node) {
 	orientation, imagesToBeComposed := l.composableSubset(images)
 	if orientation == horizontal {
-		return l.splitVertically(imagesToBeComposed)
+		return orientation, l.splitVertically(imagesToBeComposed)
 	} else {
-		return l.splitHorizontally(imagesToBeComposed)
+		return orientation, l.splitHorizontally(imagesToBeComposed)
 	}
 }
 
