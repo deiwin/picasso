@@ -22,6 +22,18 @@ func getImageOrientation(image image.Image) orientation {
 	}
 }
 
+// DrawGridLayout draws an image composed into a grid layout. The layout will coerce all provided images into either a
+// portrait or a landscape picture with an aspect ratio of sqrt(2) (or sqrt(2) and 1/sqrt(2) to be precise). The composed
+// image will also have the same aspect ratio. This allows indefinitely splitting the composed image into halves while
+// maintaining the same aspect ratios for all parts.
+//
+// To enforce an aspect ratio on the resulting image, the interface allows one to only specify the width. The height of the
+// resulting image will be either width/sqrt(2) if it's in landscape or width*sqrt(2) if it's in portrait. The orientation
+// of the resulting image depends on the orientation of the provided images that it will be composed of.
+//
+// This layout is not able to manage some combinations of orientations of the provided images. For the example, it has
+// now way to compose a single portrait and a single landscape image. In these cases, the layout will simply discard the
+// last image in the list.
 func DrawGridLayout(images []image.Image, width int) image.Image {
 	if len(images) == 0 {
 		return nil
@@ -32,6 +44,7 @@ func DrawGridLayout(images []image.Image, width int) image.Image {
 	return node.Draw(width, height)
 }
 
+// DrawGridLayoutWithBorder does the exact same thing that DrawGridLayout does, but with borders.
 func DrawGridLayoutWithBorder(images []image.Image, width int, borderColor color.Color, borderWidth int) image.Image {
 	if len(images) == 0 {
 		return nil
