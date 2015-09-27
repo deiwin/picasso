@@ -132,9 +132,9 @@ func (l gridLayout) splitHorizontally(images []image.Image) Node {
 
 func move1VerticalCountOver(aImages, bImages []image.Image) ([]image.Image, []image.Image) {
 	aHasHorizontal, lastAHorizontalIndex := indexOfLastHorizontalImage(aImages)
-	bHasVertical, lastBVerticalIndex := indexOfLastVerticalImage(bImages)
+	bHasVertical, firstBVerticalIndex := indexOfFirstVerticalImage(bImages)
 	if aHasHorizontal && bHasVertical {
-		return swapImage(aImages, lastAHorizontalIndex, bImages, lastBVerticalIndex)
+		return swapImage(aImages, lastAHorizontalIndex, bImages, firstBVerticalIndex)
 	}
 	aHasVertical, lastAVerticalIndex := indexOfLastVerticalImage(aImages)
 	if aHasVertical {
@@ -146,9 +146,9 @@ func move1VerticalCountOver(aImages, bImages []image.Image) ([]image.Image, []im
 
 func move1HorizontalCountOver(aImages, bImages []image.Image) ([]image.Image, []image.Image) {
 	aHasVertical, lastAVerticalIndex := indexOfLastVerticalImage(aImages)
-	bHasHorizontal, lastBHorizontalIndex := indexOfLastHorizontalImage(bImages)
+	bHasHorizontal, firstBHorizontalIndex := indexOfFirstHorizontalImage(bImages)
 	if aHasVertical && bHasHorizontal {
-		return swapImage(aImages, lastAVerticalIndex, bImages, lastBHorizontalIndex)
+		return swapImage(aImages, lastAVerticalIndex, bImages, firstBHorizontalIndex)
 	}
 	aHasHorizontal, lastAHorizontalIndex := indexOfLastHorizontalImage(aImages)
 	if aHasHorizontal {
@@ -207,6 +207,16 @@ func swapImage(aImages []image.Image, aIndex int, bImages []image.Image, bIndex 
 	return newAImages, newBImages
 }
 
+func indexOfFirstVerticalImage(images []image.Image) (hasVerticalImage bool, index int) {
+	for i, image := range images {
+		orientation := getImageOrientation(image)
+		if orientation == vertical {
+			return true, i
+		}
+	}
+	return false, -1
+}
+
 func indexOfLastVerticalImage(images []image.Image) (hasVerticalImage bool, index int) {
 	for i := len(images) - 1; i >= 0; i-- {
 		orientation := getImageOrientation(images[i])
@@ -232,6 +242,15 @@ func indexOfNextToLastVerticalImage(images []image.Image) int {
 	return -1
 }
 
+func indexOfFirstHorizontalImage(images []image.Image) (hasHorizontalImage bool, index int) {
+	for i, image := range images {
+		orientation := getImageOrientation(image)
+		if orientation == horizontal {
+			return true, i
+		}
+	}
+	return false, -1
+}
 func indexOfLastHorizontalImage(images []image.Image) (hasHorizontalImage bool, index int) {
 	for i := len(images) - 1; i >= 0; i-- {
 		orientation := getImageOrientation(images[i])
