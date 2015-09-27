@@ -160,19 +160,30 @@ func move1HorizontalCountOver(aImages, bImages []image.Image) ([]image.Image, []
 
 func move1ImageOver(aImages []image.Image, aIndex int, bImages []image.Image) ([]image.Image, []image.Image) {
 	newAImages := make([]image.Image, len(aImages)-1)
+	newBImages := make([]image.Image, len(bImages)+1)
+
 	copy(newAImages[:aIndex], aImages[:aIndex])
 	copy(newAImages[aIndex:], aImages[aIndex+1:])
-	newBImages := append(bImages, aImages[aIndex])
+
+	copy(newBImages[1:], bImages)
+	newBImages[0] = aImages[aIndex]
+
 	return newAImages, newBImages
 }
 
 // move2ImagesOver expects aIndex1 < aIndex2
 func move2ImagesOver(aImages []image.Image, aIndex1, aIndex2 int, bImages []image.Image) ([]image.Image, []image.Image) {
 	newAImages := make([]image.Image, len(aImages)-2)
+	newBImages := make([]image.Image, len(bImages)+2)
+
 	copy(newAImages[:aIndex1], aImages[:aIndex1])
 	copy(newAImages[aIndex1:aIndex2-1], aImages[aIndex1+1:aIndex2])
 	copy(newAImages[aIndex2-1:], aImages[aIndex2+1:])
-	newBImages := append(bImages, aImages[aIndex1], aImages[aIndex2])
+
+	copy(newBImages[2:], bImages)
+	newBImages[0] = aImages[aIndex1]
+	newBImages[1] = aImages[aIndex2]
+
 	return newAImages, newBImages
 }
 
