@@ -23,6 +23,9 @@ func getImageOrientation(image image.Image) orientation {
 }
 
 func DrawGridLayout(images []image.Image, width int) image.Image {
+	if len(images) == 0 {
+		return nil
+	}
 	l := gridLayout{}
 	orientation, node := l.compose(images)
 	height := l.getHeight(orientation, width)
@@ -30,6 +33,9 @@ func DrawGridLayout(images []image.Image, width int) image.Image {
 }
 
 func DrawGridLayoutWithBorder(images []image.Image, width int, borderColor color.Color, borderWidth int) image.Image {
+	if len(images) == 0 {
+		return nil
+	}
 	l := gridLayout{}
 	orientation, node := l.compose(images)
 	height := l.getHeight(orientation, width)
