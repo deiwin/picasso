@@ -5,8 +5,8 @@ import "image"
 type orientation bool
 
 const (
-	vertical   orientation = orientation(true)
 	horizontal orientation = orientation(false)
+	vertical   orientation = orientation(true)
 )
 
 func getImageOrientation(image image.Image) orientation {
@@ -20,37 +20,49 @@ func getImageOrientation(image image.Image) orientation {
 
 type gridLayout struct{}
 
-func (l gridLayout) x() {
-}
-
-func (l gridLayout) findMainOrientation(images []image.Image) orientation {
-	horizontalCount, _ := l.countMainOrientation(0, 0, images)
-	if horizontalCount == 1 {
-		return horizontal
+func (l gridLayout) doThings(images []image.Image) {
+	orientation, imagesToBeComposed := l.composableSubset(images)
+	if orientation == horizontal {
+		return l.splitVertically(imagesToBeComposed)
 	} else {
-		return vertical
+		return l.splitHorizontally(imagesToBeComposed)
 	}
 }
 
-// countMainOrientation recursively traverses the list of provided images and looks at what would the orienation of the composed image
+// composableSubset returns either all or all but the last image provided depending on if all images can be used to create the layout
+// without any gaps. It also returns what orientation the resulting images would take when composed.
+func (l gridLayout) composableSubset(images []image.Image) (orientation, []image.Image) {
+	horizontalCount, verticalCount := l.countComposedOrientation(0, 0, images)
+	if horizontalCount == 1 && verticalCount == 1 {
+		lastImageOrientation := getImageOrientation(images[len(images)-1])
+		if lastImageOrientation == horizontal {
+			return vertical, images[:len(images)-1]
+		} else {
+			return horizontal, images[:len(images)-1]
+		}
+	}
+
+	if horizontalCount == 1 {
+		return horizontal, images
+	} else {
+		return vertical, images
+	}
+}
+
+// countComposedOrientation recursively traverses the list of provided images and looks at what would the orienation of the composed image
 // be if all of those images were put into a grid layout. It works by counting 2 horizontal (landscape) images as a single vertical
-// (portrait) image and vice versa. It might ignore the last image in the list, if adding that would mess up the layout (for example, if
-// the current calculated orientation is horizontal and the last picture is vertical, then the last picture will be ignored).
-func (l gridLayout) countMainOrientation(horizontalCount, verticalCount int, images []image.Image) (int, int) {
+// (portrait) image and vice versa.
+func (l gridLayout) countComposedOrientation(horizontalCount, verticalCount int, images []image.Image) (int, int) {
 	if len(images) == 0 {
 		return horizontalCount, verticalCount
 	}
-	newHorizontalCount, newVerticalCount := l.addImageToMainOrientationCount(horizontalCount, verticalCount, images[0])
-	// Ignore the last image if it would leave us in an incompatible state
-	if len(images) == 1 && newHorizontalCount == 1 && newVerticalCount == 1 {
-		return horizontalCount, verticalCount
-	}
-	return l.countMainOrientation(newHorizontalCount, newVerticalCount, images[1:])
+	newHorizontalCount, newVerticalCount := l.addImageToComposedOrientationCount(horizontalCount, verticalCount, images[0])
+	return l.countComposedOrientation(newHorizontalCount, newVerticalCount, images[1:])
 }
 
-func (l gridLayout) addImageToMainOrientationCount(horizontalCount, verticalCount int, image image.Image) (int, int) {
-	orietation := getImageOrientation(image)
-	if orietation == vertical {
+func (l gridLayout) addImageToComposedOrientationCount(horizontalCount, verticalCount int, image image.Image) (int, int) {
+	orientation := getImageOrientation(image)
+	if orientation == vertical {
 		return l.addVertical(horizontalCount, verticalCount)
 	} else {
 		return l.addHorizontal(horizontalCount, verticalCount)
