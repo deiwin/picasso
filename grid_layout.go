@@ -43,54 +43,14 @@ func (l gridLayout) splitVertically(images []image.Image) Node {
 	// now we need to redistribute the images so that both sides would compose to vertical orientation
 	// NB: this method expects this to be possible
 	if proposedLeftHorizontalCount == 1 && proposedLeftVerticalCount == 0 && proposedRightHorizontalCount == 1 && proposedRightVerticalCount == 1 {
-		leftHasHorizontal, lastLeftHorizontalIndex := indexOfLastHorizontalImage(proposedLeftImages)
-		rightHasVertical, lastRightVerticalIndex := indexOfLastVerticalImage(proposedRightImages)
-		if leftHasHorizontal && rightHasVertical {
-			leftImages, rightImages := swapImage(proposedLeftImages, lastLeftHorizontalIndex, proposedRightImages, lastRightVerticalIndex)
-			return VerticalSplit{
-				Ratio: 1,
-				Left:  l.splitHorizontally(leftImages),
-				Right: l.splitHorizontally(rightImages),
-			}
-		}
-		leftHasVertical, lastLeftVerticalIndex := indexOfLastVerticalImage(proposedLeftImages)
-		if leftHasVertical {
-			leftImages, rightImages := move1ImageOver(proposedLeftImages, lastLeftVerticalIndex, proposedRightImages)
-			return VerticalSplit{
-				Ratio: 1,
-				Left:  l.splitHorizontally(leftImages),
-				Right: l.splitHorizontally(rightImages),
-			}
-		}
-		nextToLastLeftHorizontalIndex := indexOfNextToLastHorizontalImage(proposedLeftImages)
-		leftImages, rightImages := move2ImagesOver(proposedLeftImages, nextToLastLeftHorizontalIndex, lastLeftHorizontalIndex, proposedRightImages)
+		leftImages, rightImages := move1VerticalCountOver(proposedLeftImages, proposedRightImages)
 		return VerticalSplit{
 			Ratio: 1,
 			Left:  l.splitHorizontally(leftImages),
 			Right: l.splitHorizontally(rightImages),
 		}
 	} else if proposedLeftHorizontalCount == 1 && proposedLeftVerticalCount == 1 && proposedRightHorizontalCount == 1 && proposedRightVerticalCount == 0 {
-		leftHasVertical, lastLeftVerticalIndex := indexOfLastVerticalImage(proposedLeftImages)
-		rightHasHorizontal, lastRightHorizontalIndex := indexOfLastHorizontalImage(proposedRightImages)
-		if leftHasVertical && rightHasHorizontal {
-			leftImages, rightImages := swapImage(proposedLeftImages, lastLeftVerticalIndex, proposedRightImages, lastRightHorizontalIndex)
-			return VerticalSplit{
-				Ratio: 1,
-				Left:  l.splitHorizontally(leftImages),
-				Right: l.splitHorizontally(rightImages),
-			}
-		}
-		leftHasHorizontal, lastLeftHorizontalIndex := indexOfLastHorizontalImage(proposedLeftImages)
-		if leftHasHorizontal {
-			leftImages, rightImages := move1ImageOver(proposedLeftImages, lastLeftHorizontalIndex, proposedRightImages)
-			return VerticalSplit{
-				Ratio: 1,
-				Left:  l.splitHorizontally(leftImages),
-				Right: l.splitHorizontally(rightImages),
-			}
-		}
-		nextToLastLeftVerticalIndex := indexOfNextToLastVerticalImage(proposedLeftImages)
-		leftImages, rightImages := move2ImagesOver(proposedLeftImages, nextToLastLeftVerticalIndex, lastLeftVerticalIndex, proposedRightImages)
+		leftImages, rightImages := move1HorizontalCountOver(proposedLeftImages, proposedRightImages)
 		return VerticalSplit{
 			Ratio: 1,
 			Left:  l.splitHorizontally(leftImages),
@@ -102,6 +62,34 @@ func (l gridLayout) splitVertically(images []image.Image) Node {
 		Left:  l.splitHorizontally(proposedLeftImages),
 		Right: l.splitHorizontally(proposedRightImages),
 	}
+}
+
+func move1VerticalCountOver(aImages, bImages []image.Image) ([]image.Image, []image.Image) {
+	aHasHorizontal, lastAHorizontalIndex := indexOfLastHorizontalImage(aImages)
+	bHasVertical, lastBVerticalIndex := indexOfLastVerticalImage(bImages)
+	if aHasHorizontal && bHasVertical {
+		return swapImage(aImages, lastAHorizontalIndex, bImages, lastBVerticalIndex)
+	}
+	aHasVertical, lastAVerticalIndex := indexOfLastVerticalImage(aImages)
+	if aHasVertical {
+		return move1ImageOver(aImages, lastAVerticalIndex, bImages)
+	}
+	nextToLastAHorizontalIndex := indexOfNextToLastHorizontalImage(aImages)
+	return move2ImagesOver(aImages, nextToLastAHorizontalIndex, lastAHorizontalIndex, bImages)
+}
+
+func move1HorizontalCountOver(aImages, bImages []image.Image) ([]image.Image, []image.Image) {
+	aHasVertical, lastAVerticalIndex := indexOfLastVerticalImage(aImages)
+	bHasHorizontal, lastBHorizontalIndex := indexOfLastHorizontalImage(bImages)
+	if aHasVertical && bHasHorizontal {
+		return swapImage(aImages, lastAVerticalIndex, bImages, lastBHorizontalIndex)
+	}
+	aHasHorizontal, lastAHorizontalIndex := indexOfLastHorizontalImage(aImages)
+	if aHasHorizontal {
+		return move1ImageOver(aImages, lastAHorizontalIndex, bImages)
+	}
+	nextToLastAVerticalIndex := indexOfNextToLastVerticalImage(aImages)
+	return move2ImagesOver(aImages, nextToLastAVerticalIndex, lastAVerticalIndex, bImages)
 }
 
 func (l gridLayout) splitHorizontally(images []image.Image) Node {
