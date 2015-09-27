@@ -40,9 +40,9 @@ type gridLayout struct{}
 
 func (l gridLayout) getHeight(orientation orientation, width int) int {
 	if orientation == horizontal {
-		return int(float32(width) * math.Sqrt2)
-	} else {
 		return int(float32(width) / math.Sqrt2)
+	} else {
+		return int(float32(width) * math.Sqrt2)
 	}
 }
 
