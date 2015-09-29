@@ -34,7 +34,7 @@ Will compose the following image:
 *Picasso* also supports different automatic layouts and borders, so that the following code:
 
 ```go
-images = []image.Image{
+images := []image.Image{
 	girlBeforeAMirror,
 	oldGuitarist,
 	womenOfAlgiers,
@@ -43,11 +43,22 @@ images = []image.Image{
 	laReve,
 }
 layout := picasso.GoldenSpiralLayout()
-image := layout.Compose(images).DrawWithBorder(600, 600, color.RGBA{0xaf, 0xaf, 0xaf, 0xff}, 2)
+gray := color.RGBA{0xaf, 0xaf, 0xaf, 0xff}
+image := layout.Compose(images).DrawWithBorder(600, 600, gray, 2)
 ```
 
 Will compose an image using the golden ratio:
 
 ![automatic](https://raw.githubusercontent.com/deiwin/picasso/master/test_images/golden_spiral_with_border.png)
+
+Or one could use the GridLayout:
+```go
+images := []image.Image{...}
+gray := color.RGBA{0xaf, 0xaf, 0xaf, 0xff}
+image := picasso.DrawGridLayoutWithBorder(images, 800, gray, 2)
+```
+to compose larger sets of images:
+
+![composed](https://cloud.githubusercontent.com/assets/2261897/10125748/c22d5144-6588-11e5-8962-8458313ff0bf.jpg)
 
 *See tests for more examples*
